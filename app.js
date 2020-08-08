@@ -22,10 +22,12 @@ const mongooseOptions = {
 
 if (config.database.isProd) {
     mongooseOptions.auth = config.database.auth
-    mongoUri = config.database.uri
+    mongoUri = config.database.withoutAuth
 }
 
-mongoose.connect(mongoUri, mongooseOptions);
+console.log(mongoUri);
+
+mongoose.connect('mongodb+srv://admin:admin@cluster0.tdyon.mongodb.net/specialvigilanceunit?retryWrites=true&w=majority');
 
 let db = mongoose.connection;
 //Check connection 
@@ -34,7 +36,7 @@ db.once('open', function() {
 })
 // Check for DB errors
 db.on('error', function() {
-    console.log(err);
+    console.log('err');
 });
 app.use(morgan('dev'));
 

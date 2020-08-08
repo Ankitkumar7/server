@@ -23,8 +23,8 @@ module.exports = {
     database: {
       uri: process.env.uri || 'mongodb://10.0.1.198:27017,10.0.2.182:27017,10.0.2.114:27017/SDMSUat?replicaSet=SDMSUat',
       auth: process.env.auth || { user: 'testuser', password: 'testuser123' },
-      withoutAuth: 'mongodb://localhost:27017/specialvigilanceunit',
-      isProd: false
+      withoutAuth: 'mongodb+srv://admin:admin@cluster0.tdyon.mongodb.net/specialvigilanceunit?retryWrites=true&w=majority',
+      isProd: true
     },
     externalServices: {
       emailService : "https://localhost:3027/api/v1/comm/node/email",
