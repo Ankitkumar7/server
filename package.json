@@ -1,0 +1,35 @@
+{
+  "name": "utilityservice",
+  "version": "0.0.1",
+  "description": "utility server for handling config level logic",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/rahulgangulytnt/nsdcserverside.git"
+  },
+  "keywords": [
+    "utilityservice"
+  ],
+  "author": "Ankit Kumar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/rahulgangulytnt/nsdcserverside/issues"
+  },
+  "homepage": "https://gitlab.com/rahulgangulytnt/nsdcserverside#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.7-alpha.4",
+    "mongoose": "^5.9.25",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "nodemon": "^2.0.3",
+    "randomatic": "^3.1.1",
+    "request": "^2.88.2"
+  }
+}
