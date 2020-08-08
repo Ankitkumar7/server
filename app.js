@@ -62,6 +62,12 @@ app.use(function (req, res, next) {
 app.use('/api/svu/v1', caseControl);
 app.use('/api/svu/v1/user', userControl);
 
+app.use(express.static('./dist/'));
+app.get('/svu', function(req, res) {
+    res.sendFile('index.html', {root: 'dist/'}
+  );
+  });
+
 
 
 app.use((req, res, next) => {
