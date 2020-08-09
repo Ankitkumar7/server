@@ -272,7 +272,10 @@ function writeFile(file, res, req) {
     //     CF.save().then(data => {
     //     })
     // });
-    fs.unlink(appDir + '/' + fileName)
+    fs.unlinkSync(fileName).then(res => {
+        console.log(res);
+        
+    })
     res.status(200).json({status: 'Uploaded'});
 
   
