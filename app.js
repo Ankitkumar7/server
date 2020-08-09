@@ -26,8 +26,8 @@ if (config.database.isProd) {
 }
 
 // console.log(mongoUri);
-mongoose.connect("mongodb://localhost:27017/specialvigilanceunit")
-// mongoose.connect('mongodb+srv://admin:admin@cluster0.tdyon.mongodb.net/specialvigilanceunit?retryWrites=true&w=majority');
+// mongoose.connect("mongodb://localhost:27017/specialvigilanceunit")
+mongoose.connect('mongodb+srv://admin:admin@cluster0.tdyon.mongodb.net/specialvigilanceunit?retryWrites=true&w=majority');
 
 let db = mongoose.connection;
 //Check connection 
