@@ -9,7 +9,14 @@ const casefile_model = require('./models/casefile_model');
 const enquiryModel = require('./models/enquiry_model');
 const enquiry_model = require('./models/enquiry_model');
 const user_model = require('./models/user_model');
-
+var cloudinary = require('cloudinary');
+const app = require('../app');
+CLOUDINARY_URL="cloudinary://454741914527481:moHCUUvqzSRmEdCcs7gFsu_2L3Y@dan5drelz"
+cloudinary.config({ 
+    cloud_name: 'dan5drelz', 
+    api_key: '454741914527481', 
+    api_secret: 'moHCUUvqzSRmEdCcs7gFsu_2L3Y' 
+  });
 router.post('/addcase', (req, res, next) => {
     const caseDoc = new caseModel(req.body);
     caseDoc.save(req.body).then(data => {
@@ -202,31 +209,73 @@ router.put('/updateEnquiry', (req, res, next) => {
 
 
 router.post('/saveFiles', (req, res, next) => {
-    const toPut = {fileName: req.files.file.name, caseNo: req.query.caseNo}
-    console.log(toPut);
-    
-    const CF = new casefile_model(toPut)
-    CF.save().then(data => {
-        writeFile(req.files.file, res)
-    })
+    writeFile(req.files.file, res, req)
+   
 
     
     
 })
 
-function writeFile(file, res) {
+function writeFile(file, res, req) {
+    var appDir = path.dirname(require.main.filename);
+    console.log(appDir);
+    
     const fileName = file && file.name || 'no_name.xlsx'
     const buffer = file && file.data
     let writeStream = fs.createWriteStream(fileName);
     writeStream.write(buffer, 'base64');
+    var fileToUpload = path.dirname(fileName);
+   
+
+    // cloudinary.image(fileToUpload, {secure: true, transformation: [
+    //     {width: 150, height: 150, gravity: "face", crop: "thumb"},
+    //     {radius: 20},
+    //     {effect: "sepia"},
+    //     {overlay: "cloudinary_icon", gravity: "south_east", x: 5, y: 5, width: 50, opacity: 60, effect: "brightness:200"},
+    //     {angle: 10}
+    //     ]})
     // the finish event is emitted when all data has been flushed from the stream
     writeStream.on('finish', () => {
     console.log(' Downloaded Successfully');
    
     }); 
     writeStream.end();
-    res.status(200).json({err: 'uploaded success'});
+    cloudinary.v2.uploader.upload(appDir + '/' + fileName, 
+    {resource_type: "raw",
+    overwrite: true},
+    function(error, result) {
+        console.log(result);
+        casefile_model.findOne({caseNo: req.query.caseNo})
+        .exec()
+        .then(data => {
+            if(data) {
+                casefile_model.findOneAndUpdate({caseNo: req.query.caseNo}, {$set: {fileName: result.url}})
+                .exec()
+                .then(data => {
+                })
+            } else {
+                const toPut = {fileName: result.url, caseNo: req.query.caseNo}
+                console.log(toPut);
+                const CF = new casefile_model(toPut)
+                CF.save().then(data => {
+                   
+                })
+            }
+        })
+    });
+    // cloudinary.uploader.upload(appDir + '/' + fileName, function(error, result) {
+    //     console.log(error);
+    //     console.log(result);
+    //     const toPut = {fileName: error.url, caseNo: req.query.caseNo}
+    //     console.log(toPut);
+    //     const CF = new casefile_model(toPut)
+    //     CF.save().then(data => {
+    //     })
+    // });
+    fs.unlink(appDir + '/' + fileName)
+    res.status(200).json({status: 'Uploaded'});
 
+  
   }
 
  
@@ -237,9 +286,10 @@ router.get('/downloadFile', (req, res, next) => {
     .exec()
     .then(data => {
         console.log(data);
-        
-        var file = appDir + "/" +data.fileName
-        res.download(file); // Set disposition and send it.
+        res.status(200).json({
+            data: data
+        })   
+     
     })
     .catch(err => {
         console.log(err)

@@ -48,6 +48,9 @@ const caseSchema = moongose.Schema({
     },
     'reviewComment': {
         type: String
+    },
+    'fileUrl' : {
+        type: String
     }
   
 })

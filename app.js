@@ -25,14 +25,14 @@ if (config.database.isProd) {
     mongoUri = config.database.withoutAuth
 }
 
-console.log(mongoUri);
-
-mongoose.connect('mongodb+srv://admin:admin@cluster0.tdyon.mongodb.net/specialvigilanceunit?retryWrites=true&w=majority');
+// console.log(mongoUri);
+mongoose.connect("mongodb://localhost:27017/specialvigilanceunit")
+// mongoose.connect('mongodb+srv://admin:admin@cluster0.tdyon.mongodb.net/specialvigilanceunit?retryWrites=true&w=majority');
 
 let db = mongoose.connection;
 //Check connection 
 db.once('open', function() {
-    console.log(`Conncted to MongoDB address ${mongoUri}`)
+    console.log(`Conncted to MongoDB address mongodb://localhost:27017/specialvigilanceunit`)
 })
 // Check for DB errors
 db.on('error', function() {
