@@ -4,4 +4,4 @@ const config = require('./config/development')
 
 const port = config.server.port
 const server = http.createServer(app);
-server.listen(8181);
+server.listen(process.env.PORT || 8080);
