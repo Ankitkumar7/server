@@ -17,6 +17,12 @@ const enquirySchema = moongose.Schema({
     },
     "createdBy": {
         type: String
+    },
+    "enquiry_model": {
+        type: String
+    },
+    'reviewComment': {
+        type: String
     }
 })
 

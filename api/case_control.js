@@ -308,5 +308,41 @@ router.get('/allUser', (req, res, next) => {
  
 })
 
+router.get('/addcomment', (req, res, next) => {
+    const caseId = req && req.query && req.query.caseNo
+    const comment = req && req.query && req.query.reviewComment
+
+
+    caseModel.findOneAndUpdate({caseNo: caseId}, {$set: {reviewComment: comment}})
+    .exec()
+    .then(data => {
+        
+        res.status(200).json({
+            message: "Comment added"
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({err: 'Something Went Wrong'});
+    })
+})
+
+
+router.get('/addenqcomment', (req, res, next) => {
+    const enqNo = req && req.query && req.query.enqNo
+    const comment = req && req.query && req.query.reviewComment
+    enquiry_model.findOneAndUpdate({enquiryNo: enqNo}, {$set: {reviewComment: comment}})
+    .exec()
+    .then(data => {
+        
+        res.status(200).json({
+            message: "Comment added"
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({err: 'Something Went Wrong'});
+    })
+})
 
 module.exports = router;

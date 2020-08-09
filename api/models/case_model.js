@@ -46,6 +46,9 @@ const caseSchema = moongose.Schema({
     "createdBy": {
         type: String
     },
+    'reviewComment': {
+        type: String
+    }
   
 })
 
