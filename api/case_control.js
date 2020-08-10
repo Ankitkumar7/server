@@ -280,8 +280,8 @@ function writeFile(file, res, req) {
 
   
   }
+  
 
- 
 router.get('/downloadFile', (req, res, next) => {
     var appDir = path.dirname(require.main.filename);
     const caseNo = req && req.query.caseNo;
