@@ -22,6 +22,9 @@ const caseSchema = moongose.Schema({
     "trialStatus" : {
         type: String
     },
+    'confiscationStatus': {
+        type: String
+    },
     "chartSheetDate" : {
         type: String,
        
