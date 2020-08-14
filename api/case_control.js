@@ -11,6 +11,8 @@ const enquiry_model = require('./models/enquiry_model');
 const user_model = require('./models/user_model');
 var cloudinary = require('cloudinary');
 const app = require('../app');
+const Excel = require('exceljs');
+
 CLOUDINARY_URL="cloudinary://454741914527481:moHCUUvqzSRmEdCcs7gFsu_2L3Y@dan5drelz"
 cloudinary.config({ 
     cloud_name: 'dan5drelz', 
@@ -396,6 +398,164 @@ router.get('/addenqcomment', (req, res, next) => {
         console.log(err)
         res.status(500).json({err: 'Something Went Wrong'});
     })
+})
+
+
+async function enqReport(data, res){
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet("My Sheet");
+    worksheet.properties.header 
+  worksheet.columns = [
+    {header: 'ENQUIRY NO', key: 'enqNo', width: 25, style: {alignment: {horizontal: "center"}}},
+    {header: 'DATE', key: 'date', width: 25, style: {alignment: {horizontal: "center"}}},
+    {header: 'NAME OF SUSPECT', key: 'suspectName', width: 25, style: {alignment: {horizontal: "center"}}}, 
+    {header: 'NAME OF ENQUIRY OFFICER.', key: 'nameOfEnqOfficer', width: 35, style: {alignment: {horizontal: "center"}}},
+    {header: 'COMMENT', key: 'comment', width:50, style: {alignment: {horizontal: "center"}}},
+    {header: 'STATUS', key: 'status', width:50, style: {alignment: {horizontal: "center"}}},
+  ];
+  worksheet.getRow(1).fill = {
+    type: 'pattern',
+    pattern:'solid',
+    fgColor:{ argb:'cccccc' }
+    }
+    if(data && data.length > 0) {
+        for(let index=0 ; index< data.length; index++) {
+            worksheet.addRow({
+                enqNo: data[index].enquiryNo,
+                date: data[index].date,
+                suspectName: data[index].suspectName,
+                nameOfEnqOfficer: data[index].enqOfficerName,
+                comment: data[index].reviewComment,
+                status: data[index].status,
+                }
+                );
+        }
+    }
+  await workbook.xlsx.writeFile('enqRprt.xlsx');
+
+  
+  // save under export.xlsx
+    //  res.status(200).json({
+    //         message: 'Genrated success'
+    //     })
+    workbook.xlsx.writeBuffer(res).then(function (buffer) {
+        res.status(200).send(buffer)
+    })
+  console.log("File is written");
+  };
+
+
+
+async function caseReport(data, res){
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet("My Sheet");
+    worksheet.properties.header 
+  worksheet.columns = [
+    {header: 'CASE NUMBER', key: 'caseNo', width: 25, style: {alignment: {horizontal: "center"}}},
+    {header: 'DATE', key: 'date', width: 25, style: {alignment: {horizontal: "center"}}},
+    {header: 'UNDER SECTION	', key: 'underSection', width: 25, style: {alignment: {horizontal: "center"}}}, 
+    {header: 'NAME OF ACCUSE.', key: 'nameOfExc', width: 35, style: {alignment: {horizontal: "center"}}},
+    {header: 'COMMENT', key: 'comment', width:50, style: {alignment: {horizontal: "center"}}},
+    {header: 'PROSECUTION SANCTION STATUS', key: 'pSanctionStatus', width:50, style: {alignment: {horizontal: "center"}}},
+    {header: 'CHARGE SHEET NO & DATE', key: 'chargeSheet', width:50, style: {alignment: {horizontal: "center"}}},
+    {header: 'TRIAL STATUS	', key: 'trailStatus', width:25, style: {alignment: {horizontal: "center"}}},
+    {header: 'CONFISCATION STATUS', key: 'confiscationStatus', width:25, style: {alignment: {horizontal: "center"}}},
+    {header: 'DEPARTMENTAL PROCEEDING', key: 'preceeding', width:35, style: {alignment: {horizontal: "center"}}},
+    {header: 'STATUS', key: 'status', width:35, style: {alignment: {horizontal: "center"}}}
+
+  ];
+  worksheet.getRow(1).fill = {
+    type: 'pattern',
+    pattern:'solid',
+    fgColor:{ argb:'cccccc' }
+    }
+    if(data && data.length > 0) {
+        for(let index=0 ; index< data.length; index++) {
+            worksheet.addRow({
+                caseNo: data[index].caseNo,
+                date: data[index].date,
+                underSection: data[index].underSection,
+                nameOfExc: data[index].nameOfAccuse,
+                comment: data[index].reviewComment,
+                pSanctionStatus: data[index].prosSanctionStatus,
+                chargeSheet: data[index].chartSheetDate,
+                trailStatus: data[index].trialStatus,
+                confiscationStatus: data[index].confiscationStatus,
+                preceeding: data[index].depProceeding,
+                status: data[index].status
+               
+                }
+                );
+        }
+    }
+
+  
+  // save under export.xlsx
+//   await workbook.xlsx.writeFile('caseReport.xlsx');
+    //  res.status(200).json({
+    //         message: 'Genrated success'
+    //     })
+    workbook.xlsx.writeBuffer(res).then(function (buffer) {
+        res.status(200).send(buffer)
+    })
+  console.log("File is written");
+  };
+router.get('/generateReport', (req, res, next) => {
+    const caseType = req && req.query && req.query.type;
+    caseModel.find({status: caseType}).sort({_id:-1})
+    .exec()
+    .then(data => {
+        caseReport(data, res)
+     
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({err: 'Something Went Wrong'});
+    })
+  
+    // const enqNo = req && req.query && req.query.enqNo
+    // const comment = req && req.query && req.query.reviewComment
+    // enquiry_model.findOneAndUpdate({enquiryNo: enqNo}, {$set: {reviewComment: comment}})
+    // .exec()
+    // .then(data => {
+        
+    //     res.status(200).json({
+    //         message: "Comment added"
+    //     })
+    // })
+    // .catch(err => {
+    //     console.log(err)
+    //     res.status(500).json({err: 'Something Went Wrong'});
+    // })
+})
+
+
+router.get('/generateEnqReport', (req, res, next) => {
+    const enqType = req && req.query && req.query.type;
+    enquiry_model.find({status: enqType}).sort({_id:-1})
+    .exec()
+    .then(data => {
+        enqReport(data, res)
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({err: 'Something Went Wrong'});
+    })
+  
+    // const enqNo = req && req.query && req.query.enqNo
+    // const comment = req && req.query && req.query.reviewComment
+    // enquiry_model.findOneAndUpdate({enquiryNo: enqNo}, {$set: {reviewComment: comment}})
+    // .exec()
+    // .then(data => {
+        
+    //     res.status(200).json({
+    //         message: "Comment added"
+    //     })
+    // })
+    // .catch(err => {
+    //     console.log(err)
+    //     res.status(500).json({err: 'Something Went Wrong'});
+    // })
 })
 
 module.exports = router;
