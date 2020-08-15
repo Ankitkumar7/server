@@ -84,7 +84,7 @@ router.post('/applogin', (req, res, next) => {
                 
             // }
             console.log(data);
-            userModel.findOneAndUpdate(toQuery, {$set: {notification_ids:data['notification_ids']}})
+            userModel.findOneAndUpdate(toQuery, {$set: {notification_ids:notificationId}})
             .exec()
             .then(data => {
                 if(data) {
