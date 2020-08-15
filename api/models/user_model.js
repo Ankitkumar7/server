@@ -17,6 +17,9 @@ const usersSchema = moongose.Schema({
     },
     "status": {
         type: String
+    },
+    'notification_ids': {
+        type: Array
     }
 })
 
