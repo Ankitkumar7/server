@@ -23,6 +23,9 @@ const enquirySchema = moongose.Schema({
     },
     'reviewComment': {
         type: String
+    },
+    'notification_id': {
+        type: String
     }
 })
 

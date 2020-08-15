@@ -54,6 +54,9 @@ const caseSchema = moongose.Schema({
     },
     'fileUrl' : {
         type: String
+    },
+    'notification_id': {
+        type: String
     }
   
 })
