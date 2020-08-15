@@ -72,16 +72,17 @@ router.post('/applogin', (req, res, next) => {
     .exec()
     .then(data => {
         if(data) {
+            data['notification_ids'] = notificationId
                 // write logic to save
-            if(data && data.notification_ids && data.notification_ids.length > 0) {
-                for(let index=0; index < data.notification_ids.length; index++) {
-                    if(data.notification_ids[index] !== notificationId) {
-                        data.notification_ids.push(notificationId)
-                    }
-                }
-            } else {
-                data['notification_ids'] = [notificationId]
-            }
+            // if(data && data.notification_ids && data.notification_ids.length > 0) {
+            //     for(let index=0; index < data.notification_ids.length; index++) {
+            //         if(data.notification_ids[index] !== notificationId) {
+            //             data.notification_ids.push(notificationId)
+            //         }
+            //     }
+            // } else {
+                
+            // }
             console.log(data);
             userModel.findOneAndUpdate(toQuery, {$set: {notification_ids:data['notification_ids']}})
             .exec()
