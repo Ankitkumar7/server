@@ -13,6 +13,62 @@ var cloudinary = require('cloudinary');
 const app = require('../app');
 const Excel = require('exceljs');
 
+var querystring = require('querystring');
+var http = require('http');
+var fs = require('fs');
+
+
+function sendNotification(caseNo,comment, id) {
+    // Build the post string from an object
+    var post_data = querystring.stringify(
+        {
+            "notification":{
+              "title": `Case Number: ${caseNo}`,
+              "body": `${comment}`,
+              "sound":"default",
+              "click_action":"FCM_PLUGIN_ACTIVITY",
+              "icon":"fcm_push_icon"
+            },
+            "data":{
+              "landing_page":"second",
+              "price":"$3,000.00"
+            },
+              "to": id,
+              "priority":"high",
+              "restricted_package_name":""
+          }
+    );
+  
+    // An object of options to indicate where to post to
+    var post_options = {
+        host: 'https://fcm.googleapis.com/fcm/send',
+        // port: '80',
+        // path: '/compile',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'key=AAAAkmugzp0:APA91bHIIyrD29Fxso2wF3BYI1nYSAahh3eRSKlCEghslt7GacBFhhRe9OwATVLh4AP8-B977VUJpcGubiYomsqWZrFEpdGQCyOo1YQN1NQK0S9Eff-hvHxnuVkQqScxgBqzA6Gh1PNt'
+        }
+    };
+  
+    // Set up the request
+    var post_req = http.request(post_options, function(res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            console.log('Response: ' + chunk);
+        });
+    });
+    // post the data
+    post_req.write(post_data);
+    post_req.end();
+  
+  }
+  
+
+
+
+
+
 CLOUDINARY_URL="cloudinary://454741914527481:moHCUUvqzSRmEdCcs7gFsu_2L3Y@dan5drelz"
 cloudinary.config({ 
     cloud_name: 'dan5drelz', 
@@ -366,12 +422,11 @@ router.get('/allUser', (req, res, next) => {
 router.get('/addcomment', (req, res, next) => {
     const caseId = req && req.query && req.query.caseNo
     const comment = req && req.query && req.query.reviewComment
-
-
+    const id = req && req.query && req.query.id
     caseModel.findOneAndUpdate({caseNo: caseId}, {$set: {reviewComment: comment}})
     .exec()
     .then(data => {
-        
+        sendNotification(caseId,comment,id)
         res.status(200).json({
             message: "Comment added"
         })

@@ -5,8 +5,6 @@ const userModel = require('./models/user_model');
 
 
 
-
-
 router.get('/login', (req, res, next) => {
     // let skip = (parseInt(req.query.pageNo) - 1) * parseInt(req.query.limit);
     // .skip(skip).limit(parseInt(req.query.limit))
