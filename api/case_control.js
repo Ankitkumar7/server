@@ -17,52 +17,86 @@ var querystring = require('querystring');
 var http = require('http');
 var fs = require('fs');
 
+var request = require('request');
 
-function sendNotification(caseNo,comment, id) {
-    // Build the post string from an object
-    var post_data = querystring.stringify(
-        {
-            "notification":{
-              "title": `Case Number: ${caseNo}`,
-              "body": `${comment}`,
-              "sound":"default",
-              "click_action":"FCM_PLUGIN_ACTIVITY",
-              "icon":"fcm_push_icon"
-            },
-            "data":{
-              "landing_page":"second",
-              "price":"$3,000.00"
-            },
-              "to": id,
-              "priority":"high",
-              "restricted_package_name":""
-          }
-    );
-  
-    // An object of options to indicate where to post to
-    var post_options = {
-        host: 'https://fcm.googleapis.com/fcm/send',
-        // port: '80',
-        // path: '/compile',
-        method: 'POST',
+function sendNotification(caseNo, comment, id) {
+    let payLoad = {
+        "notification":{
+                          "title": `Case Number: ${caseNo}`,
+                          "body": `${comment}`,
+                          "sound":"default",
+                          "click_action":"FCM_PLUGIN_ACTIVITY",
+                          "icon":"fcm_push_icon"
+                        },
+                        "data":{
+                          "landing_page":"second",
+                          "price":"$3,000.00"
+                        },
+                          "to": id,
+                          "priority":"high",
+                          "restricted_package_name":""
+                      
+    }
+    request({
+        url: "https://fcm.googleapis.com/fcm/send",
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json',
+            "content-type": "application/json",  // <--Very important!!!,
             'Authorization': 'key=AAAAkmugzp0:APA91bHIIyrD29Fxso2wF3BYI1nYSAahh3eRSKlCEghslt7GacBFhhRe9OwATVLh4AP8-B977VUJpcGubiYomsqWZrFEpdGQCyOo1YQN1NQK0S9Eff-hvHxnuVkQqScxgBqzA6Gh1PNt'
-        }
-    };
+        },
+        body: JSON.stringify(payLoad)
+    }, function (error, response, body){
+        console.log(response);
+    }); 
+
+
+}
+
+// function sendNotification(caseNo,comment, id) {
+//     // Build the post string from an object
+//     var post_data = querystring.stringify(
+//         {
+//             "notification":{
+//               "title": `Case Number: ${caseNo}`,
+//               "body": `${comment}`,
+//               "sound":"default",
+//               "click_action":"FCM_PLUGIN_ACTIVITY",
+//               "icon":"fcm_push_icon"
+//             },
+//             "data":{
+//               "landing_page":"second",
+//               "price":"$3,000.00"
+//             },
+//               "to": id,
+//               "priority":"high",
+//               "restricted_package_name":""
+//           }
+//     );
   
-    // Set up the request
-    var post_req = http.request(post_options, function(res) {
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            console.log('Response: ' + chunk);
-        });
-    });
-    // post the data
-    post_req.write(post_data);
-    post_req.end();
+//     // An object of options to indicate where to post to
+//     var post_options = {
+//         host: 'https://fcm.googleapis.com/',
+//         // port: '80',
+//         path: '/fcm/send',
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': 'key=AAAAkmugzp0:APA91bHIIyrD29Fxso2wF3BYI1nYSAahh3eRSKlCEghslt7GacBFhhRe9OwATVLh4AP8-B977VUJpcGubiYomsqWZrFEpdGQCyOo1YQN1NQK0S9Eff-hvHxnuVkQqScxgBqzA6Gh1PNt'
+//         }
+//     };
   
-  }
+//     // Set up the request
+//     var post_req = http.request(post_options, function(res) {
+//         res.setEncoding('utf8');
+//         res.on('data', function (chunk) {
+//             console.log('Response: ' + chunk);
+//         });
+//     });
+//     // post the data
+//     post_req.write(post_data);
+//     post_req.end();
+  
+//   }
   
 
 
@@ -441,10 +475,11 @@ router.get('/addcomment', (req, res, next) => {
 router.get('/addenqcomment', (req, res, next) => {
     const enqNo = req && req.query && req.query.enqNo
     const comment = req && req.query && req.query.reviewComment
+    const id = req && req.query && req.query.id
     enquiry_model.findOneAndUpdate({enquiryNo: enqNo}, {$set: {reviewComment: comment}})
     .exec()
     .then(data => {
-        
+        sendNotification(enqNo,comment,id)
         res.status(200).json({
             message: "Comment added"
         })
