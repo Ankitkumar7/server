@@ -55,11 +55,11 @@ router.get('/getnotification', (req, res, next) => {
     .then(data => {
         if(data) {
             res.status(200).json({
-                data: 'notification saved successfully'
+                data: data
             })
         } else {
             res.status(200).json({
-                data: 'user not found'
+                data: []
             })
         }
     })
