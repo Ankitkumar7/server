@@ -55,6 +55,42 @@ function sendNotification(caseNo, comment, id, created_by) {
 
 }
 
+
+function sendNotificationEnq(caseNo, comment, id, created_by) {
+    let payLoad = {
+        "notification":{
+                          "title": `Enquiry Number: ${caseNo}`,
+                          "body": `${comment}`,
+                          "created_by": created_by,
+                          "sound":"default",
+                          "click_action":"FCM_PLUGIN_ACTIVITY",
+                          "icon":"fcm_push_icon"
+                        },
+                        "data":{
+                            "recieved_on": new Date().toISOString(),
+                            "title": `Case Number: ${caseNo}`,
+                            "body": `${comment}`,
+                            "created_by": created_by
+                        },
+                          "to": id,
+                          "priority":"high",
+                          "restricted_package_name":""
+                      
+    }
+    request({
+        url: "https://fcm.googleapis.com/fcm/send",
+        method: "POST",
+        headers: {
+            "content-type": "application/json",  // <--Very important!!!,
+            'Authorization': 'key=AAAAkmugzp0:APA91bHIIyrD29Fxso2wF3BYI1nYSAahh3eRSKlCEghslt7GacBFhhRe9OwATVLh4AP8-B977VUJpcGubiYomsqWZrFEpdGQCyOo1YQN1NQK0S9Eff-hvHxnuVkQqScxgBqzA6Gh1PNt'
+        },
+        body: JSON.stringify(payLoad)
+    }, function (error, response, body){
+        console.log(response);
+    }); 
+
+
+}
 // function sendNotification(caseNo,comment, id) {
 //     // Build the post string from an object
 //     var post_data = querystring.stringify(
@@ -484,7 +520,7 @@ router.get('/addenqcomment', (req, res, next) => {
     enquiry_model.findOneAndUpdate({enquiryNo: enqNo}, {$set: {reviewComment: comment}})
     .exec()
     .then(data => {
-        sendNotification(enqNo,comment,id, created_by)
+        sendNotificationEnq(enqNo,comment,id, created_by)
         res.status(200).json({
             message: "Comment added"
         })

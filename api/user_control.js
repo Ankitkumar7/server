@@ -46,6 +46,29 @@ router.post('/savenotification', (req, res, next) => {
         })
     })
 })
+router.get('/getnotification', (req, res, next) => {
+    // let skip = (parseInt(req.query.pageNo) - 1) * parseInt(req.query.limit);
+    // .skip(skip).limit(parseInt(req.query.limit))
+    let toQuery = {created_by: req.query.created_by}
+    notification_history.find(toQuery).sort({_id:-1})
+    .exec()
+    .then(data => {
+        if(data) {
+            res.status(200).json({
+                data: 'notification saved successfully'
+            })
+        } else {
+            res.status(200).json({
+                data: 'user not found'
+            })
+        }
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({err: 'Something Went Wrong'});
+    })
+})
+
 
 
 router.get('/block', (req, res, next) => {
