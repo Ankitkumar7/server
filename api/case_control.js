@@ -19,11 +19,12 @@ var fs = require('fs');
 
 var request = require('request');
 
-function sendNotification(caseNo, comment, id) {
+function sendNotification(caseNo, comment, id, created_by) {
     let payLoad = {
         "notification":{
                           "title": `Case Number: ${caseNo}`,
                           "body": `${comment}`,
+                          "created_by": created_by,
                           "sound":"default",
                           "click_action":"FCM_PLUGIN_ACTIVITY",
                           "icon":"fcm_push_icon"
@@ -32,6 +33,7 @@ function sendNotification(caseNo, comment, id) {
                             "recieved_on": new Date().toISOString(),
                             "title": `Case Number: ${caseNo}`,
                             "body": `${comment}`,
+                            "created_by": created_by
                         },
                           "to": id,
                           "priority":"high",
@@ -458,10 +460,11 @@ router.get('/addcomment', (req, res, next) => {
     const caseId = req && req.query && req.query.caseNo
     const comment = req && req.query && req.query.reviewComment
     const id = req && req.query && req.query.id
+    const created_by = req && req.query && req.query.created_by
     caseModel.findOneAndUpdate({caseNo: caseId}, {$set: {reviewComment: comment}})
     .exec()
     .then(data => {
-        sendNotification(caseId,comment,id)
+        sendNotification(caseId,comment,id,created_by)
         res.status(200).json({
             message: "Comment added"
         })
@@ -477,10 +480,11 @@ router.get('/addenqcomment', (req, res, next) => {
     const enqNo = req && req.query && req.query.enqNo
     const comment = req && req.query && req.query.reviewComment
     const id = req && req.query && req.query.id
+    const created_by = req && req.query && req.query.created_by
     enquiry_model.findOneAndUpdate({enquiryNo: enqNo}, {$set: {reviewComment: comment}})
     .exec()
     .then(data => {
-        sendNotification(enqNo,comment,id)
+        sendNotification(enqNo,comment,id, created_by)
         res.status(200).json({
             message: "Comment added"
         })
