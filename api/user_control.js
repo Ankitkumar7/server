@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userModel = require('./models/user_model');
-
+const notification_history = require('./models/notification_models')
 
 
 
@@ -37,6 +37,16 @@ router.post('/adduser', (req, res, next) => {
         })
     })
 })
+
+router.post('/savenotification', (req, res, next) => {
+    const payLoad = new notification_history(req.body);
+    payLoad.save(req.body).then(data => {
+        res.status(200).json({
+            message: "notification history saved"
+        })
+    })
+})
+
 
 router.get('/block', (req, res, next) => {
     const toQuery = {userName: req.query.userName}

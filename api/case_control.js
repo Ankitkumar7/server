@@ -29,8 +29,9 @@ function sendNotification(caseNo, comment, id) {
                           "icon":"fcm_push_icon"
                         },
                         "data":{
-                          "landing_page":"second",
-                          "price":"$3,000.00"
+                            "recieved_on": new Date().toISOString(),
+                            "title": `Case Number: ${caseNo}`,
+                            "body": `${comment}`,
                         },
                           "to": id,
                           "priority":"high",
