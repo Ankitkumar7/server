@@ -12,12 +12,62 @@ const user_model = require('./models/user_model');
 var cloudinary = require('cloudinary');
 const app = require('../app');
 const Excel = require('exceljs');
-
+const documentSchema = require('./models/document_model');
 var querystring = require('querystring');
 var http = require('http');
 var fs = require('fs');
 
 var request = require('request');
+
+
+router.post('/addDocument', (req, res, next) => {
+    const document = new documentSchema(req.body);
+    document.save(req.body).then(data => {
+        res.status(200).json({
+            message: "Document Saved!"
+        })
+    })
+})
+
+
+
+
+router.get('/alldocument', (req, res, next) => {
+    documentSchema.find().sort({_id:-1})
+    .exec()
+    .then(data => {
+        res.status(200).json({
+            data: data
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({err: 'Something Went Wrong'});
+    })
+})
+
+router.post('/updateDocument', (req, res, next) => {
+    const id = req && req.query && req.query.id;
+    let dataToPut = {
+        modified_on: req.body.modified_on,
+        content:req.body.content,
+        fileName: req.body.fileName,
+        created_on: req.body.created_on
+,
+    }
+    documentSchema.findOneAndUpdate({_id: id}, {$set: dataToPut}).sort({_id:-1})
+    .exec()
+    .then(data => {
+        res.status(200).json({
+            data: 'document updated'
+        })
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({err: 'Something Went Wrong'});
+    })
+})
+
 
 function sendNotification(caseNo, comment, id, created_by) {
     let payLoad = {
@@ -584,7 +634,8 @@ async function caseReport(data, res){
   worksheet.columns = [
     {header: 'CASE NUMBER', key: 'caseNo', width: 25, style: {alignment: {horizontal: "center"}}},
     {header: 'DATE', key: 'date', width: 25, style: {alignment: {horizontal: "center"}}},
-    {header: 'UNDER SECTION	', key: 'underSection', width: 25, style: {alignment: {horizontal: "center"}}}, 
+    {header: 'UNDER SECTION	', key: 'underSection', width: 25, style: {alignment: {horizontal: "center"}}},
+    {header: 'INVESTIGATION OFFICER', key: 'invOfficer', width: 35, style: {alignment: {horizontal: "center"}}},
     {header: 'NAME OF ACCUSE.', key: 'nameOfExc', width: 35, style: {alignment: {horizontal: "center"}}},
     {header: 'COMMENT', key: 'comment', width:50, style: {alignment: {horizontal: "center"}}},
     {header: 'PROSECUTION SANCTION STATUS', key: 'pSanctionStatus', width:50, style: {alignment: {horizontal: "center"}}},
@@ -606,6 +657,7 @@ async function caseReport(data, res){
                 caseNo: data[index].caseNo,
                 date: data[index].date,
                 underSection: data[index].underSection,
+                invOfficer: data[index].invOfficer,
                 nameOfExc: data[index].nameOfAccuse,
                 comment: data[index].reviewComment,
                 pSanctionStatus: data[index].prosSanctionStatus,
